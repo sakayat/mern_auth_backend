@@ -199,3 +199,8 @@ export const checkAuth = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const logout = async (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({ success: true, message: "Logged out successfully" });
+};
