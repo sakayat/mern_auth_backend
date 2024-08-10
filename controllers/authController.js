@@ -38,7 +38,7 @@ export const signup = async (req, res) => {
     });
     await user.save();
 
-    // // jwt
+    // jwt
     generateTokenAndSetCookies(res, user._id);
 
     await sendVerificationEmail(user.email, verificationToken);
@@ -100,6 +100,8 @@ export const login = async (req, res) => {
     if (!checkPassword) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
+
+    generateTokenAndSetCookies(res, user._id);
 
     user.lastLogin = new Date();
 
@@ -179,6 +181,20 @@ export const resetPassword = async (req, res) => {
     res
       .status(200)
       .json({ success: true, message: "Password reset successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const checkAuth = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ success: true, user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
